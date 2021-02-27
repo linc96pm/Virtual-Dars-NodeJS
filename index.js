@@ -13,8 +13,22 @@ const config = require('config');
 const Logger = require('./services/logger/logger');
 const logger = new Logger('vd-logs');
 
+// process.on('warning', err => {
+//     logger.error(err.message, err);
+// });
+
+logger.exceptionHandler();
+
+process.on('unhandledRejection', ex => {
+   throw ex;
+});
+
+const myPromise = Promise.reject('Another unexpected error!').then('finished');
+
+throw new Error('Unexpected error!');
+
 if (!config.get('jwtPrivateKey')) {
-    logger.processExit();
+    logger.processExit(1, 'virtualdars_jwtPrivateKey not found!');
 }
 
 mongoose.connect('mongodb://localhost/virtualdars', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })

@@ -10,7 +10,7 @@ class LoggerService {
         this.route = route
 
         const file = new winston.transports.File({
-            filename: `./logs/${route}_${d}.log`
+            filename: `./logs/${this.route}_${d}.log`
         });
         const db = new winston.transports.MongoDB({ db: 'mongodb://localhost/virtualdars-logs' });
         const logger = winston.createLogger({
@@ -19,22 +19,23 @@ class LoggerService {
                 file, db
             ],
             format: winston.format.printf((info) => {
-                let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route}.log | ${info.message} | `
+                let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${this.route}.log | ${info.message} | `
                 message = info.obj ? message + `data:${JSON.stringify(info.obj)} | ` : message
                 message = this.log_data ? message + `log_data:${JSON.stringify(this.log_data)} | ` : message
                 return message
             })
         });
-        
+
         this.logger = logger
-        this.processExit = function () {
+
+        this.processExit = function (code, message) {
             file.on('open', () => {  // wait until file._dest is ready
                 // logger.info('please log me in');
                 // logger.error('logging error message');
                 // logger.warn('logging warning message');
-                this.logger.error('virtualdars_jwtPrivateKey not found!');
+                this.logger.error(message);
                 file._dest.on('finish', () => {
-                    process.exit();
+                    process.exit(code);
                 });
                 this.logger.end();
             });
@@ -43,6 +44,13 @@ class LoggerService {
         }
 
     }
+
+    exceptionHandler() {
+        winston.exceptions.handle(new winston.transports.File({
+            filename: `./logs/${this.route}_${d}.log`
+        }))
+    }
+
     setLogData(log_data) {
         this.log_data = log_data
     }
