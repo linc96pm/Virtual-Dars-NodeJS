@@ -1,0 +1,25 @@
+{
+  "name": "Tasks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MTI",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "config": "^3.3.1",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "joi": "^14.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.19",
+    "mongoose": "^5.9.23",
+    "nodemon": "^2.0.4",
+    "winston": "^3.3.3",
+    "winston-mongodb": "^5.0.5"
+  }
+}

@@ -1,0 +1,6 @@
+02-27-2021 20:45:45:125 | INFO | vd-logs.log | 5000 is being listened... | 
+02-27-2021 20:45:45:166 | ERROR | vd-logs.log | virtualdars_jwtPrivateKey not found! | 
+02-27-2021 20:46:44:609 | INFO | vd-logs.log | 5000 is being listened... | 
+02-27-2021 20:46:44:621 | ERROR | vd-logs.log | virtualdars_jwtPrivateKey not found! | 
+02-27-2021 20:47:54:769 | INFO | vd-logs.log | 5000 is being listened... | 
+02-27-2021 20:47:54:870 | INFO | vd-logs.log | Connected to MongoDB... | 
