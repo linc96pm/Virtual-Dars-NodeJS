@@ -1,4 +1,6 @@
-const winston = require('winston')
+require('express-async-errors');
+const winston = require('winston');
+const path = require('path');
 require('winston-mongodb');
 const { dateFormat, onlyDate } = require('../date/date');
 
@@ -9,32 +11,44 @@ class LoggerService {
         this.log_data = null
         this.route = route
 
-        const file = new winston.transports.File({
+        this.fileTransport = new winston.transports.File({
             filename: `./logs/${this.route}_${d}.log`
         });
-        const db = new winston.transports.MongoDB({ db: 'mongodb://localhost/virtualdars-logs' });
+        this.consoleTransport = new winston.transports.Console();
+        this.dbTransport = new winston.transports.MongoDB({ db: 'mongodb://localhost/virtualdars-logs' });
         const logger = winston.createLogger({
-            transports: [
-                new winston.transports.Console(),
-                file, db
-            ],
-            format: winston.format.printf((info) => {
-                let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${this.route}.log | ${info.message} | `
-                message = info.obj ? message + `data:${JSON.stringify(info.obj)} | ` : message
-                message = this.log_data ? message + `log_data:${JSON.stringify(this.log_data)} | ` : message
-                return message
-            })
+            transports: [this.consoleTransport, this.fileTransport, this.dbTransport],
+            format: winston.format.combine(
+                winston.format((info) => {
+                    info.level = info.level.toUpperCase();
+                    return info;
+                })(),
+                winston.format.colorize(),
+                winston.format.label({ label: path.basename(require.main.filename) }),
+                winston.format.splat(),
+                winston.format.prettyPrint(),
+                // winston.format.json(),
+                winston.format.printf((info) => {
+                    let message = `${dateFormat()} | ${info.level} | [${info.label}] | ${info.message}| `;
+                    message = info.obj
+                        ? message + `data:${JSON.stringify(info.obj)} | `
+                        : message;
+                    message = this.log_data
+                        ? message + `log_data:${JSON.stringify(this.log_data)} | `
+                        : message;
+                    return message;
+                })
+            ),
         });
 
-        this.logger = logger
-
+        this.logger = logger;
         this.processExit = function (code, message) {
-            file.on('open', () => {  // wait until file._dest is ready
+            this.fileTransport.on('open', () => {  // wait until file._dest is ready
                 // logger.info('please log me in');
                 // logger.error('logging error message');
                 // logger.warn('logging warning message');
                 this.logger.error(message);
-                file._dest.on('finish', () => {
+                this.fileTransport._dest.on('finish', () => {
                     process.exit(code);
                 });
                 this.logger.end();
@@ -42,13 +56,13 @@ class LoggerService {
 
             setTimeout(() => { }, 100); // pause the process until process.exit is call
         }
-
     }
 
     exceptionHandler() {
-        winston.exceptions.handle(new winston.transports.File({
-            filename: `./logs/${this.route}_${d}.log`
-        }))
+        winston.exceptions.handle([this.consoleTransport, this.fileTransport]);
+        process.on('unhandledRejection', ex => {
+            throw ex.message;
+        });
     }
 
     setLogData(log_data) {
