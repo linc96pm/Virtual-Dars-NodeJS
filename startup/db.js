@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const db = require('config').get('db');
 const Logger = require('../services/logger/logger');
 const logger = new Logger('vd-logs');
 
 module.exports = function () {
-    mongoose.connect('mongodb://localhost/virtualdars', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+    mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
         .then(() => {
             logger.info('Connected to MongoDB...');
         })
