@@ -1,6 +1,7 @@
 require('express-async-errors');
 const winston = require('winston');
 const path = require('path');
+const db = require('config').get('db');
 require('winston-mongodb');
 const { dateFormat, onlyDate } = require('../date/date');
 
@@ -15,7 +16,7 @@ class LoggerService {
             filename: `./logs/${this.route}_${d}.log`
         });
         this.consoleTransport = new winston.transports.Console();
-        this.dbTransport = new winston.transports.MongoDB({ db: 'mongodb://localhost/virtualdars-logs' });
+        this.dbTransport = new winston.transports.MongoDB({ db: db });
         const logger = winston.createLogger({
             transports: [this.consoleTransport, this.fileTransport, this.dbTransport],
             format: winston.format.combine(
