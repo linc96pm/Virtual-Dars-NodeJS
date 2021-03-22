@@ -16,7 +16,10 @@ class LoggerService {
             filename: `./logs/${this.route}_${d}.log`
         });
         this.consoleTransport = new winston.transports.Console();
-        this.dbTransport = new winston.transports.MongoDB({ db: db });
+        this.dbTransport = new winston.transports.MongoDB({
+            db: 'mongodb://localhost:27017/virtualdars',
+            collection: 'logs'
+        });
         const logger = winston.createLogger({
             transports: [this.consoleTransport, this.fileTransport, this.dbTransport],
             format: winston.format.combine(
@@ -45,7 +48,7 @@ class LoggerService {
         this.logger = logger;
         this.processExit = function (code, message) {
             this.fileTransport.on('open', () => {  // wait until file._dest is ready
-                // logger.info('please log me in');
+                logger.info('please log me in');
                 // logger.error('logging error message');
                 // logger.warn('logging warning message');
                 this.logger.error(message);

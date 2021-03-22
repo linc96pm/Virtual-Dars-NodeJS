@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const config = require('config');
 const Logger = require('./services/logger/logger');
 const logger = new Logger('vd-logs');
 
@@ -12,6 +11,8 @@ require('./startup/prod')(app);
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     logger.info(`${port} is being listened...`);
 });
+
+module.exports = server;

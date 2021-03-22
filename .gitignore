@@ -1,5 +1,7 @@
 node_modules/
+coverage/
 package-lock.json
 *.txt
 logs/
 hash.js
+setvar.sh

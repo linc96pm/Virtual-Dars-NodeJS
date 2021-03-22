@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const { Category, validate } = require('../models/category');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
@@ -33,6 +34,9 @@ router.post('/', auth, async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+        return res.status(404).send('Invalid Id');
+
     let category = await Category.findById(req.params.id);
     if (!category)
         return res.status(404).send(`The category with this id ${req.params.id} not found in DB`);
